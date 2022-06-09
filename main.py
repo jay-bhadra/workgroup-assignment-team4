@@ -1,9 +1,9 @@
-import os
 from flask import Flask, render_template, request, session, redirect, url_for
 from sqlalchemy import create_engine
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
-cooldm = Flask(__name__)
+app = Flask(__name__)
 
 ocl_pw = r'Group3!'
 #pub_ip = r"35.198.145.47"
@@ -13,13 +13,13 @@ project_id = r"elevated-creek-351619"
 instance_name = r"devapps-cloud"
 db_port = "3306"
 
-cooldm.config["SECRET_KEY"] = "this is not secret, remember, change it!"
+app.config["SECRET_KEY"] = "this is not secret, remember, change it!"
 
 db_url = f"mysql+pymysql://root:{ocl_pw}@{pub_ip}:{db_port}/{dbname}" #TCP
 
 engine = create_engine(db_url)
 
-@cooldm.route("/")
+@app.route("/")
 def index():
     if "username" in session:
         query = f"""
@@ -37,11 +37,11 @@ def index():
         return render_template("index.html")
     
 
-@cooldm.route("/register")
+@app.route("/register")
 def register():
     return render_template("register.html")
 
-@cooldm.route("/register", methods=["POST"])
+@app.route("/register", methods=["POST"])
 def handle_register():
     username=request.form["username"]
     password=request.form["password"]
@@ -76,7 +76,7 @@ def handle_register():
         return redirect(url_for("index"))
 
 
-@cooldm.route("/users")
+@app.route("/users")
 def users():
     if "username" in session:
         query = f"""
@@ -93,7 +93,7 @@ def users():
         return render_template("404.html"), 404
 
 
-@cooldm.route("/users/<user_id>")
+@app.route("/users/<user_id>")
 def user_detail(user_id):
     query = f"""
     SELECT id, username, picture
@@ -110,11 +110,11 @@ def user_detail(user_id):
         else:
             return render_template("404.html"), 404
 
-@cooldm.route("/login")
+@app.route("/login")
 def login():
     return render_template("login.html")
 
-@cooldm.route("/login", methods=["POST"])
+@app.route("/login", methods=["POST"])
 def handle_login():
     username=request.form["username"]
     password=request.form["password"]
@@ -135,7 +135,7 @@ def handle_login():
         else:
             return render_template("404.html"), 404
 
-@cooldm.route("/logout")
+@app.route("/logout")
 def logout():
     session.pop("username")
     session.pop("user_id")
@@ -145,7 +145,7 @@ def logout():
 
 
 
-@cooldm.route("/msg_processor/<to_id>", methods=["GET", "POST"])
+@app.route("/msg_processor/<to_id>", methods=["GET", "POST"])
 def msg_processor(to_id):
         text = request.form["text"]
         text = text.replace("'", "''")        
@@ -170,7 +170,7 @@ def msg_processor(to_id):
             
             return redirect(url_for("dm", to_id=to_id))
 
-@cooldm.route("/dm/<to_id>")
+@app.route("/dm/<to_id>")
 def dm(to_id):
     
     messages = []
@@ -201,7 +201,7 @@ def dm(to_id):
     print(messages)
     return render_template("dm.html", messages=messages, recipient_name=recipient_name, to_id=to_id)
 
-@cooldm.route('/dm')
+@app.route('/dm')
 def open_dm():
     if "username" in session:
         query = f"""
@@ -221,5 +221,8 @@ def open_dm():
         return render_template("404.html"), 404
 
 
+
+
 if __name__ == "__main__":
-    cooldm.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+   #app.run(debug=True, port=5000) # comment this line before deploying ONLINE
+   app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
