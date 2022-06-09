@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, session, redirect, url_for
 from sqlalchemy import create_engine
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -220,6 +221,5 @@ def open_dm():
         return render_template("404.html"), 404
 
 
-
-
-cooldm.run(debug=True)
+if __name__ == "__main__":
+    cooldm.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
