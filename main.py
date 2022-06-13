@@ -56,22 +56,6 @@ def handle_register():
     with engine.connect() as connection:
         connection.execute(insert_query)
     
-    follow_query = f"""
-    SELECT id
-    FROM users
-    WHERE username='{username}'
-    """
-    with engine.connect() as connection:
-        follower_id = connection.execute(follow_query).fetchone()
-    
-    follower_id = follower_id[0]
-    
-    insert_follower_query = f"""
-    INSERT INTO follows(follower_id, followee_id)
-    VALUES ('{follower_id}', '{follower_id}')
-    """    
-    with engine.connect() as connection:
-        connection.execute(insert_follower_query)
 
         return redirect(url_for("index"))
 
