@@ -217,13 +217,16 @@ def handle_update_info():
     username=request.form["username"]
     password=request.form["password"]
     picture=request.form["picture"]
+    hashed_password=""
     
     if username:
         username = username
     else:
         username=old_username      
     
-    hashed_password = generate_password_hash(password)
+    if password:
+        hashed_password = generate_password_hash(password)
+        
     
     query_columns = {'username':username, 'password':hashed_password, 'picture':picture}
     index = 0
