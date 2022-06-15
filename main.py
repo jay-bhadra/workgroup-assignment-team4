@@ -203,8 +203,76 @@ def open_dm():
             return render_template("open_dm.html", users=users)
     else:
         return render_template("404.html"), 404
+    
+@app.route('/update_info')
+def update_info():
+    if "username" in session:
+        return render_template("update_info.html")
+    else:
+        return redirect(url_for("index"))
+    
+@app.route('/handle_update_info', methods=["GET", "POST"])
+def handle_update_info():
+    old_username = session["username"]
+    username=request.form["username"]
+    password=request.form["password"]
+    picture=request.form["picture"]
+    
+    if username:
+        username = username
+    else:
+        username=old_username      
+    
+    hashed_password = generate_password_hash(password)
+    
+    query_columns = {'username':username, 'password':hashed_password, 'picture':picture}
+    index = 0
 
+    set_query = ""
+    for query_column in query_columns.values():
+            if query_column:
+                keys = list(query_columns)
+                values_dict = list(query_columns.values())
+                if isinstance(query_column, int)==True or isinstance(query_column, float)==True:
+                    set_query += str(keys[index]) + " = " + values_dict[index] + ", "
+                else:
+                    set_query += str(keys[index]) + " = " + "'" + values_dict[index] + "', "
+            index += 1
+    set_query = set_query[:-2]
+    
+    if set_query != "":                        
+        update_owner_query = f"""
+        UPDATE users 
+        SET {set_query}
+        WHERE username = '{old_username}';
+        """
+        
+        with engine.connect() as connection:
+            connection.execute(update_owner_query)
+        
+    session["username"] = username
+    return redirect(url_for("index"))
 
+@app.route('/del_convo/<to_id>')
+def del_convo(to_id):
+    username_query=f"""
+    SELECT id FROM users
+    WHERE username='{session['username']}'
+    """
+    
+    with engine.connect() as connection:
+        user = connection.execute(username_query).fetchone()
+    user=user[0]
+    
+    delete_convo_query = f"""
+    DELETE from messages
+    WHERE (to_id='{to_id}' AND from_id='{user}')
+    """
+    
+    with engine.connect() as connection:
+        connection.execute(delete_convo_query)    
+    
+    return redirect(url_for("open_dm"))    
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@
 <div class="user">
   <img src="{{user[2]}}" alt="image for {{user[1]}}" class="profile">
   <span><a href="{{url_for('dm', to_id=user[0])}}">{{user[1]}}</a> </span>
+   <a class="btn btn-primary" href="{{url_for('del_convo', to_id=user[0])}}">X</a></span>
 </div>
 {% endfor %}
 {% endblock %}
