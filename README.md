@@ -29,3 +29,4 @@ Push your latest code by March 8th 22:00 GMT+1.  I'll only grade the
 latest version in the `main` branch.
 
 [^1]: Ensure that all operations doable when you start the project are still doable when you submit it.
+Woohoo
