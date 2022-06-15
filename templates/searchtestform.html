@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block main %}
+    <br/>
+    <h2>Whatcha looking for?</h2>
+<form action="/search" method="POST">
+<input type="text" placeholder="Search..." id="word" name="word">
+</form>
+
+
+
+{% endblock %}
